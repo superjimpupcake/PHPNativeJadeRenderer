@@ -19,7 +19,7 @@ class Renderer
                     $value = json_encode($value);
                 }
                 else if(is_string($value)){
-                    $value = '"'.$value.'"';
+                    $value = '"'.addslashes($value).'"';
                 }
                 $var_definitions .= "- var $var_name = $value\n";
             }
@@ -27,9 +27,11 @@ class Renderer
         $jade_template_content = file_get_contents($jade_template);        
         $jade_template_content = $var_definitions . $jade_template_content;
 
-        file_put_contents($jade_template.".tmp", $jade_template_content);
+        $jade_template_tmp = $jade_template.".tmp";
 
-        shell_exec("{$this->compiler_path} -P < $jade_template.tmp > $jade_template.html");
+        file_put_contents($jade_template_tmp, $jade_template_content);
+
+        shell_exec("{$this->compiler_path} -P < $jade_template_tmp > $jade_template.html");
 
         $output = file_get_contents("$jade_template.html");
         $output = trim($output);
