@@ -10,7 +10,7 @@ class Renderer
         $this->compiler_path = $compiler_path;
     }
 
-    public function render($jade_template, $data = array())
+    public function render($jade_template, $data = array(), $return_output = false)
     {
         $var_definitions = "";
         if(count($data) > 0){
@@ -31,6 +31,13 @@ class Renderer
 
         shell_exec("{$this->compiler_path} -P < $jade_template.tmp > $jade_template.html");
 
-        print file_get_contents("$jade_template.html");
+        $output = file_get_contents("$jade_template.html");
+
+        if($return_output){
+            return $output;
+        }
+        else{
+            print $output;
+        }
     }
 }
