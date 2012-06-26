@@ -32,6 +32,7 @@ class Renderer
         shell_exec("{$this->compiler_path} -P < $jade_template.tmp > $jade_template.html");
 
         $output = file_get_contents("$jade_template.html");
+        $output = trim($output);
 
         if($return_output){
             return $output;
