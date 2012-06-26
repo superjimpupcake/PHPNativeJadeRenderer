@@ -12,18 +12,20 @@ Render Jade template with PHP using the native Jade Rendering Engine
 For detail usage on Jade Template, please see: https://github.com/visionmedia/jade#readme
 
 ```php
-- if (items.length)
-  ul
-    - items.forEach(function(item){
-      li= item
-    - })
-for user in students 
-  if user.role == 'admin'
-    p #{user.name} is an admin
-  else
-    p= user.name
-p= content
-p!= content
+<?php
+require "../src/PHPNativeJade/Renderer.php";
+
+$renderer = new PHPNativeJade\Renderer();
+$renderer->setNativeJadeCompiler("/usr/local/bin/jade");
+$renderer->render("index.jade", array(
+    'items' => array(1,2,3,4,5),
+    'students' => array(
+        array('name' => 'tom', 'role' => 'editor'),
+        array('name' => 'ken', 'role' => 'admin'),
+        array('name' => 'john', 'role' => 'visitor')
+    ),
+    'content' => 'This is a paragraph from the cms <br/>',
+));
 ```
 
 3.In test.jade we have
