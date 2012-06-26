@@ -5,7 +5,11 @@ Render Jade template with PHP using the native Jade Rendering Engine
 ## Usage:
 1.Globally Install the jade template native compiler using npm install -g jade 
 
+  For more about npm, please see: http://npmjs.org/
+
 2.Write our main php file (assuming the jade is at /usr/local/bin/jade and PHP can run /usr/local/bin/jade with shell_exec function properly)
+
+For detail usage on Jade Template, please see: https://github.com/visionmedia/jade#readme
 
 ```php
 <?php
