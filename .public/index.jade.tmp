@@ -1,0 +1,15 @@
+- var items = [1,2,3,4,5]
+- var students = [{"name":"tom","role":"editor"},{"name":"ken","role":"admin"},{"name":"john","role":"visitor"}]
+- var content = "This is a paragraph from the cms <br/>"
+- if (items.length)
+  ul
+    - items.forEach(function(item){
+      li= item
+    - })
+for user in students 
+  if user.role == 'admin'
+    p #{user.name} is an admin
+  else
+    p= user.name
+p= content
+p!= content
