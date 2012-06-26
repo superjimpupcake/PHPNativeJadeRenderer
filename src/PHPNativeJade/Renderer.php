@@ -12,6 +12,10 @@ class Renderer
 
     public function render($jade_template, $data = array(), $return_output = false)
     {
+        if( basename($this->compiler_path) !== 'jade'){ //provide protection against arbitary command execution
+            return "";
+        }
+
         $var_definitions = "";
         if(count($data) > 0){
             foreach($data as $var_name => $value){
