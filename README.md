@@ -28,7 +28,7 @@ $renderer->render("index.jade", array(
 ));
 ```
 
-3.In test.jade we have
+3.In index.jade we have
 
 ```jade
 - if (items.length)
