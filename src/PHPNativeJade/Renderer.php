@@ -12,13 +12,29 @@ class Renderer
 
     public function render($jade_template, $data = array(), $return_output = false)
     {
+
+        //check if the data is really changed
+        $data_json = json_encode($data);
+
+        $data_need_regen = true; 
+        if(is_readable("$jade_template.data")){
+            $data_cache = file_get_contents("$jade_template.data"); 
+            if($data_cache == $data_json){
+                $data_need_regen = false; 
+            }
+        }
+
+        if($data_need_regen){
+            file_put_contents("$jade_template.data", $data_json);
+        }
+
         $jade_template_mtime = filemtime($jade_template);
         $jade_template_html_mtime = FALSE;
         if(is_readable("$jade_template.html")){
             $jade_template_html_mtime = filemtime("$jade_template.html");
         }
 
-        if($jade_template_mtime > $jade_template_html_mtime){ //the jade template is modified, start the process of generating the html
+        if($data_need_regen || ($jade_template_mtime > $jade_template_html_mtime)){ //the jade template is modified, start the process of generating the html
             if(!isset($this->compiler_path)){
                 $this->compiler_path = trim(shell_exec("which jade 2>&1")); //if the compiler path is not set yet, try to find a default one
             }
@@ -28,7 +44,9 @@ class Renderer
             }
 
             $var_definitions = "";
-            if(count($data) > 0){
+            $data = json_decode(file_get_contents("$jade_template.data"),true); //decode json as an associate array
+
+            if(is_array($data) && count($data) > 0){
                 foreach($data as $var_name => $value){
                     if(is_array($value)){
                         $value = json_encode($value);
@@ -39,6 +57,7 @@ class Renderer
                     $var_definitions .= "- var $var_name = $value\n";
                 }
             }
+
             $jade_template_content = file_get_contents($jade_template);        
             $jade_template_content = $var_definitions . $jade_template_content;
 
