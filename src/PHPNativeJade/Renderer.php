@@ -17,14 +17,15 @@ class Renderer
         $data_json = json_encode($data);
 
         $data_need_regen = true; 
-        if(is_readable("$jade_template.data")){
-            $data_cache = file_get_contents("$jade_template.data"); 
-            if($data_cache == $data_json){
+        if(is_readable("$jade_template.data.md5")){
+            $data_cache_md5 = file_get_contents("$jade_template.data.md5"); 
+            if($data_cache_md5 == md5($data_json)){
                 $data_need_regen = false; 
             }
         }
 
         if($data_need_regen){
+            file_put_contents("$jade_template.data.md5", md5($data_json));
             file_put_contents("$jade_template.data", $data_json);
         }
 
