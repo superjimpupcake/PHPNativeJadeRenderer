@@ -21,10 +21,6 @@ class Renderer
             if(is_readable("$jade_template.html")){
                 $jade_template_html_mtime = filemtime("$jade_template.html");
             }
-            
-            if($jade_template_mtime === FALSE || $jade_template_html_mtime === FALSE){
-                return "";
-            }
         }
 
         if($jade_template_mtime > $jade_template_html_mtime){ //the jade template is modified, start the process of generating the html
@@ -46,7 +42,7 @@ class Renderer
             $jade_template_tmp = $jade_template.".tmp";
 
             file_put_contents($jade_template_tmp, $jade_template_content);
-
+            
             shell_exec("{$this->compiler_path} -P < $jade_template_tmp > $jade_template.html");
 
 
