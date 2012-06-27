@@ -13,26 +13,41 @@ class Renderer
     public function render($jade_template, $data = array(), $return_output = false)
     {
 
+        //make the cache directory, the first time
+        $jade_template_basename = basename($jade_template);
+        $cache_dir = dirname($jade_template)."/.jadecache";
+        $data_cache = $cache_dir."/$jade_template_basename.data";
+        $data_cache_md5 = $cache_dir."/$jade_template_basename.data.md5";
+        $template_jade_tmp = $cache_dir."/$jade_template_basename.tmp";
+        $template_cache_html = $cache_dir."/$jade_template_basename.html";
+
+        if(!is_readable($cache_dir)){
+            $cache_dir_created = mkdir($cache_dir);
+            if(!$cache_dir_created){
+                return "";
+            }
+        } 
+
         //check if the data is really changed
         $data_json = json_encode($data);
 
         $data_need_regen = true; 
-        if(is_readable("$jade_template.data.md5")){
-            $data_cache_md5 = file_get_contents("$jade_template.data.md5"); 
+        if(is_readable($data_cache_md5)){
+            $data_cache_md5 = file_get_contents($data_cache_md5); 
             if($data_cache_md5 == md5($data_json)){
                 $data_need_regen = false; 
             }
         }
 
         if($data_need_regen){
-            file_put_contents("$jade_template.data.md5", md5($data_json));
-            file_put_contents("$jade_template.data", $data_json);
+            file_put_contents($data_cache_md5, md5($data_json));
+            file_put_contents($data_cache, $data_json);
         }
 
         $jade_template_mtime = filemtime($jade_template);
         $jade_template_html_mtime = FALSE;
-        if(is_readable("$jade_template.html")){
-            $jade_template_html_mtime = filemtime("$jade_template.html");
+        if(is_readable($template_cache_html)){
+            $jade_template_html_mtime = filemtime($template_cache_html);
         }
 
         if($data_need_regen || ($jade_template_mtime > $jade_template_html_mtime)){ //the jade template is modified, start the process of generating the html
@@ -45,7 +60,7 @@ class Renderer
             }
 
             $var_definitions = "";
-            $data = json_decode(file_get_contents("$jade_template.data"),true); //decode json as an associate array
+            $data = json_decode(file_get_contents($data_cache),true); //decode json as an associate array
 
             if(is_array($data) && count($data) > 0){
                 foreach($data as $var_name => $value){
@@ -62,14 +77,12 @@ class Renderer
             $jade_template_content = file_get_contents($jade_template);        
             $jade_template_content = $var_definitions . $jade_template_content;
 
-            $jade_template_tmp = $jade_template.".tmp";
+            file_put_contents($template_jade_tmp, $jade_template_content);
 
-            file_put_contents($jade_template_tmp, $jade_template_content);
-
-            shell_exec("{$this->compiler_path} -P < $jade_template_tmp > $jade_template.html");
+            shell_exec("{$this->compiler_path} -P < $template_jade_tmp > $template_cache_html");
 
 
-            $output = file_get_contents("$jade_template.html");
+            $output = file_get_contents($template_cache_html);
             $output = trim($output);
 
             if($return_output){
@@ -79,8 +92,8 @@ class Renderer
                 print $output;
             }
         }
-        else if(is_readable($jade_template.".html")){ //the jade template is not modified, do not start the process, simply just read the previous-generated html
-            require $jade_template.".html";
+        else if(is_readable($template_cache_html)){ //the jade template is not modified, do not start the process, simply just read the previous-generated html
+            require $template_cache_html;
         }
     }
 }
