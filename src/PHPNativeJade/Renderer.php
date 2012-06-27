@@ -12,18 +12,21 @@ class Renderer
 
     public function render($jade_template, $data = array(), $return_output = false)
     {
-        if( basename($this->compiler_path) !== 'jade'){ //provide protection against arbitary command execution
-            return "";
-        }
-        else{
-            $jade_template_mtime = filemtime($jade_template);
-            $jade_template_html_mtime = FALSE;
-            if(is_readable("$jade_template.html")){
-                $jade_template_html_mtime = filemtime("$jade_template.html");
-            }
+        $jade_template_mtime = filemtime($jade_template);
+        $jade_template_html_mtime = FALSE;
+        if(is_readable("$jade_template.html")){
+            $jade_template_html_mtime = filemtime("$jade_template.html");
         }
 
         if($jade_template_mtime > $jade_template_html_mtime){ //the jade template is modified, start the process of generating the html
+            if(!isset($this->compiler_path)){
+                $this->compiler_path = trim(shell_exec("which jade 2>&1")); //if the compiler path is not set yet, try to find a default one
+            }
+
+            if( basename($this->compiler_path) !== 'jade'){ //provide protection against arbitary command execution
+                return "";
+            }
+
             $var_definitions = "";
             if(count($data) > 0){
                 foreach($data as $var_name => $value){
@@ -42,7 +45,7 @@ class Renderer
             $jade_template_tmp = $jade_template.".tmp";
 
             file_put_contents($jade_template_tmp, $jade_template_content);
-            
+
             shell_exec("{$this->compiler_path} -P < $jade_template_tmp > $jade_template.html");
 
 
