@@ -33,8 +33,8 @@ class Renderer
 
         $data_need_regen = true; 
         if(is_readable($data_cache_md5)){
-            $data_cache_md5 = file_get_contents($data_cache_md5); 
-            if($data_cache_md5 == md5($data_json)){
+            $data_cache_md5_content = file_get_contents($data_cache_md5); 
+            if($data_cache_md5_content == md5($data_json)){
                 $data_need_regen = false; 
             }
         }
