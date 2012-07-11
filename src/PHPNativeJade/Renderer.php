@@ -52,7 +52,9 @@ class Renderer
 
     if($data_need_regen || ($jade_template_mtime > $jade_template_html_mtime)){ //the jade template is modified, start the process of generating the html
       if(!isset($this->compiler_path)){
-        system("which jade 2>&1", $compiler_path); //if the compiler path is not set yet, try to find a default one
+        ob_start();
+        $compiler_path = system("which jade 2>&1", $compiler_path); //if the compiler path is not set yet, try to find a default one
+        ob_end_clean();
         $this->compiler_path = $compiler_path;
       }
 
