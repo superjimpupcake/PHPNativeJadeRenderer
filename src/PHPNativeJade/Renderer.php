@@ -52,7 +52,7 @@ class Renderer
 
         if($data_need_regen || ($jade_template_mtime > $jade_template_html_mtime)){ //the jade template is modified, start the process of generating the html
             if(!isset($this->compiler_path)){
-                $this->compiler_path = trim(passthru("which jade 2>&1")); //if the compiler path is not set yet, try to find a default one
+                $this->compiler_path = trim(system("which jade 2>&1")); //if the compiler path is not set yet, try to find a default one
             }
 
             if( basename($this->compiler_path) !== 'jade'){ //provide protection against arbitary command execution
@@ -79,7 +79,7 @@ class Renderer
 
             file_put_contents($template_jade_tmp, $jade_template_content);
 
-            passthru("{$this->compiler_path} -P < $template_jade_tmp > $template_cache_html 2>&1");
+            system("{$this->compiler_path} -P < $template_jade_tmp > $template_cache_html 2>&1");
 
 
             $output = file_get_contents($template_cache_html);
