@@ -82,7 +82,7 @@ class Renderer
 
       file_put_contents($template_jade_tmp, $jade_template_content);
 
-      system("{$this->compiler_path} -P < $template_jade_tmp > $template_cache_html 2>&1");
+      system("{$this->compiler_path} -p $jade_template -P < $template_jade_tmp > $template_cache_html 2>&1");
 
 
       $output = file_get_contents($template_cache_html);
